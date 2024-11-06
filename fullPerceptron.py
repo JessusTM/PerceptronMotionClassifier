@@ -31,8 +31,7 @@ def generarTrayectoriasMovimientoPorTipo(tipoMovimiento, cantidadEjemplos):
                 trayectoria.append(punto)
         listaTrayectorias.append(trayectoria)
     trayectoriasEnArray = np.array(listaTrayectorias)
-    trayectoriasRedimensionadas = trayectoriasEnArray.reshape(
-        cantidadEjemplos, 20)
+    trayectoriasRedimensionadas = trayectoriasEnArray.reshape(cantidadEjemplos, 20)
     return trayectoriasRedimensionadas
 
 
@@ -46,8 +45,7 @@ datosAleatorio = generarTrayectoriasMovimientoPorTipo("aleatorio", 100)
 etiquetasLineales = [0] * 100
 etiquetasCirculares = [1] * 100
 etiquetasAleatorias = [2] * 100
-etiquetas = np.array(etiquetasLineales +
-                     etiquetasCirculares + etiquetasAleatorias)
+etiquetas = np.array(etiquetasLineales + etiquetasCirculares + etiquetasAleatorias)
 
 
 # ----- FUNCIÓN PARA INICIALIZAR PESOS -----
@@ -55,8 +53,7 @@ def inicializarPesosAleatorios(tamañoEntrada, tamañoCapaOculta, tamañoSalida)
     pesosEntradaOculta = np.random.uniform(
         -1, 1, size=(tamañoEntrada, tamañoCapaOculta)
     )
-    pesosOcultaSalida = np.random.uniform(-1,
-                                          1, size=(tamañoCapaOculta, tamañoSalida))
+    pesosOcultaSalida = np.random.uniform(-1, 1, size=(tamañoCapaOculta, tamañoSalida))
     return pesosEntradaOculta, pesosOcultaSalida
 
 
@@ -70,11 +67,11 @@ umbralSalida = np.random.uniform(-1, 1, size=tamañoSalida)
 
 # ----- FUNCIÓN SIGMOIDE -----
 def sigmoide(x):
-    limiteInferior = -500
-    limiteSuperior = 500
-    x = np.clip(x, limiteInferior, limiteSuperior)
-    resultadoSigmoide = 1 / (1 + np.exp(-x))
-    return resultadoSigmoide
+    xLimitado = np.clip(x, -500, 500)
+    exponenteNegativo = -xLimitado
+    eulerElevado = np.exp(exponenteNegativo)
+    resultado = 1 / (1 + eulerElevado)
+    return resultado
 
 
 # ----- FUNCIÓN SOFTMAX -----
@@ -85,10 +82,8 @@ def Softmax(puntajes):
 
 # ----- FUNCIÓN PARA GENERAR EL PERCEPTRÓN -----
 def Perceptron(entrada, pesosEntradaOculta, pesosOcultaSalida):
-    activacionesOcultas = sigmoide(
-        np.dot(entrada, pesosEntradaOculta) + umbralOculta)
-    sumaPonderadaSalida = np.dot(
-        activacionesOcultas, pesosOcultaSalida) + umbralSalida
+    activacionesOcultas = sigmoide(np.dot(entrada, pesosEntradaOculta) + umbralOculta)
+    sumaPonderadaSalida = np.dot(activacionesOcultas, pesosOcultaSalida) + umbralSalida
     return Softmax(sumaPonderadaSalida)
 
 
@@ -113,16 +108,14 @@ def EntrenarPerceptron(entradas, etiquetas, epocas=500, tasaAprendizaje=0.01):
             )
             for j in range(tamañoCapaOculta):
                 gradienteOculta = gradienteSalida @ pesosOcultaSalida[j, :]
-                pesosEntradaOculta[:, j] -= tasaAprendizaje * \
-                    gradienteOculta * entrada
+                pesosEntradaOculta[:, j] -= tasaAprendizaje * gradienteOculta * entrada
 
 
 # ----- FUNCIÓN PARA EVALUAR LA PRECISIÓN -----
 def evaluarPrecision(modelo, datosPrueba, etiquetasPrueba):
     contadorAciertos = 0
     for entrada, etiquetaReal in zip(datosPrueba, etiquetasPrueba):
-        salidaDelModelo = modelo(
-            entrada, pesosEntradaOculta, pesosOcultaSalida)
+        salidaDelModelo = modelo(entrada, pesosEntradaOculta, pesosOcultaSalida)
         clasePredicha = np.argmax(salidaDelModelo)
         if clasePredicha == etiquetaReal:
             contadorAciertos += 1
@@ -167,4 +160,3 @@ print(" -------- PRECISIÓN -------- ")
 print(f"    Lineales    : {precisionLineal * 100:.2f}%")
 print(f"    Circulares  : {precisionCircular * 100:.2f}%")
 print(f"    Aleatorias  : {precisionAleatorio * 100:.2f}%")
-
